@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalTech Studio</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1 {
+            color: #1E90FF; /* Màu xanh dương */
+            font-size: 32px;
+            margin-top: 40px;
+            font-weight: bold;
+        }
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 320px; /* Điều chỉnh độ rộng của container */
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-size: 16px;
+            color: #333333;
+            margin-top: 10px;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            width: 100%;
+            max-width: 280px; /* Điều chỉnh độ rộng của input */
+            border: 2px solid #1E90FF;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 280px; /* Điều chỉnh độ rộng của button */
+        }
+        button:hover {
+            background-color: #4682B4;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+        .history-container {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 320px;
+            margin: 20px auto;
+            text-align: left;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>GlobalTech Studio</h1>
+
+    <div class="container">
+        <label for="minNum">Số thấp nhất:</label><br>
+        <input type="number" id="minNum" placeholder="Nhập số thấp nhất" required><br>
+
+        <label for="maxNum">Số cao nhất:</label><br>
+        <input type="number" id="maxNum" placeholder="Nhập số cao nhất" required><br>
+
+        <button onclick="generateRandomNumber()">Random</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Lịch sử Random -->
+    <div class="history-container" id="historyContainer">
+        <h3>Lịch sử Random:</h3>
+        <div id="history"></div>
+        <button onclick="clearHistory()">Xoá lịch sử</button>
+    </div>
+
+    <div class="footer">
+        Bản Quyền: GlobalTech Studio
+    </div>
+
+    <script>
+        // Lấy lịch sử từ localStorage
+        function getHistory() {
+            const history = localStorage.getItem('history');
+            return history ? JSON.parse(history) : [];
+        }
+
+        // Lưu lịch sử vào localStorage
+        function saveHistory(history) {
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        // Hiển thị lịch sử
+        function displayHistory() {
+            const history = getHistory();
+            let historyHTML = '';
+            history.forEach((entry) => {
+                historyHTML += `<p>Số Random: ${entry.randomNum}, Số lần Random: ${entry.randomCount}</p>`;
+            });
+            document.getElementById('history').innerHTML = historyHTML;
+        }
+
+        // Xử lý sự kiện khi người dùng click nút Random
+        function generateRandomNumber() {
+            const minNum = parseInt(document.getElementById('minNum').value);
+            const maxNum = parseInt(document.getElementById('maxNum').value);
+
+            // Kiểm tra tính hợp lệ của dữ liệu nhập vào
+            if (isNaN(minNum) || isNaN(maxNum) || minNum >= maxNum) {
+                document.getElementById('result').innerHTML = "Vui lòng nhập đầy đủ và hợp lệ thông tin.";
+                return;
+            }
+
+            // Tạo số ngẫu nhiên
+            const randomNum = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+
+            // Lấy lịch sử hiện tại
+            const history = getHistory();
+
+            // Kiểm tra và cập nhật lịch sử
+            const existingEntry = history.find(entry => entry.randomNum === randomNum);
+            if (existingEntry) {
+                existingEntry.randomCount += 1;
+            } else {
+                history.push({
+                    randomNum: randomNum,
+                    randomCount: 1
+                });
+            }
+
+            // Lưu lại lịch sử
+            saveHistory(history);
+
+            // Hiển thị kết quả
+            document.getElementById('result').innerHTML = `Số ngẫu nhiên: ${randomNum}`;
+
+            // Hiển thị lịch sử
+            displayHistory();
+        }
+
+        // Xoá lịch sử
+        function clearHistory() {
+            localStorage.removeItem('history');
+            displayHistory(); // Cập nhật lại lịch sử khi đã xoá
+        }
+
+        // Hiển thị lịch sử khi trang được tải
+        window.onload = displayHistory;
+    </script>
+</body>
+  </html>
